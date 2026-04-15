@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: {{ name }}
+  name: {{ name }}
+  namespace: default # set namespace here
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      service: {{ name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: {{ name }}
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Africa/Nairobi
+        # add more environment variables
+        image: {{ image }}
+        imagePullPolicy: Always
+        name: {{ name }}
+        ports:
+        - containerPort: 0 # set port here and add more if need be
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: regcred # set image pull secret here
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

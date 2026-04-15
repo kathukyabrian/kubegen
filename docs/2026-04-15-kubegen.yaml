@@ -1,0 +1,315 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "60"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"service":"mobireg-engine2"},"name":"mobireg-engine2","namespace":"default"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"service":"mobireg-engine2"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"service":"mobireg-engine2"}},"spec":{"containers":[{"env":[{"name":"PROFILE_ID","value":"uat"},{"name":"TZ","value":"Africa/Nairobi"}],"image":"melioratech/mobireg-engine:latest","imagePullPolicy":"Always","name":"mobireg-engine2","ports":[{"containerPort":8890,"protocol":"TCP"},{"containerPort":8889,"protocol":"TCP"},{"containerPort":8888,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/configs","name":"mobireg-configs","readOnly":true}]}],"dnsPolicy":"ClusterFirst","imagePullSecrets":[{"name":"regcred"}],"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"items":[{"key":"engine-hibernate-config","path":"hibernate-configurations.xml"}],"name":"engine2-hibernate"},"name":"mobireg-configs"}]}}}}
+  creationTimestamp: "2022-11-21T07:25:09Z"
+  generation: 2476
+  labels:
+    service: mobireg-engine2
+  name: mobireg-engine2
+  namespace: default
+  resourceVersion: "110186212769"
+  uid: 6a9cfc66-4b66-47bc-9f56-4085cf8e5b1c
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      service: mobireg-engine2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: mobireg-engine2
+    spec:
+      containers:
+      - env:
+        - name: PROFILE_ID
+          value: uat
+        - name: TZ
+          value: Africa/Nairobi
+        image: melioratech/mobireg-engine:2.9.74
+        imagePullPolicy: Always
+        name: mobireg-engine2
+        ports:
+        - containerPort: 8890
+          protocol: TCP
+        - containerPort: 8889
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /configs
+          name: mobireg-configs
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: regcred
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: engine-hibernate-config
+            path: hibernate-configurations.xml
+          name: engine2-hibernate
+        name: mobireg-configs
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2022-11-21T07:25:09Z"
+    lastUpdateTime: "2026-04-15T10:06:54Z"
+    message: ReplicaSet "mobireg-engine2-5cc5cf768b" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-04-15T10:11:00Z"
+    lastUpdateTime: "2026-04-15T10:11:00Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2476
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"mobireg-engine2","namespace":"default"},"spec":{"clusterIP":"10.44.64.41","clusterIPs":["10.44.64.41"],"internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"name":"8890","port":8890,"protocol":"TCP","targetPort":8890},{"name":"8889","nodePort":31079,"port":8889,"protocol":"TCP","targetPort":8890},{"name":"8888","port":8888,"protocol":"TCP","targetPort":8888}],"selector":{"service":"mobireg-engine2"},"sessionAffinity":"None","type":"NodePort"},"status":{"loadBalancer":{}}}
+  creationTimestamp: "2022-11-21T07:25:08Z"
+  name: mobireg-engine2
+  namespace: default
+  resourceVersion: "87714506859"
+  uid: 2bbf47d7-a384-4b51-9585-4fa0322b63a7
+spec:
+  clusterIP: 10.44.64.41
+  clusterIPs:
+  - 10.44.64.41
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: "8890"
+    nodePort: 30371
+    port: 8890
+    protocol: TCP
+    targetPort: 8890
+  - name: "8889"
+    nodePort: 31079
+    port: 8889
+    protocol: TCP
+    targetPort: 8890
+  - name: "8888"
+    nodePort: 31075
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    service: mobireg-engine2
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: letsencrypt-prod
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"cert-manager.io/issuer":"letsencrypt-prod","nginx.ingress.kubernetes.io/proxy-body-size":"5000m"},"name":"portal2-ingress","namespace":"default"},"spec":{"ingressClassName":"nginx","rules":[{"host":"mobireg2.natujenge.ke","http":{"paths":[{"backend":{"service":{"name":"mobireg-portal","port":{"number":8080}}},"path":"/","pathType":"Prefix"},{"backend":{"service":{"name":"mobireg-engine","port":{"number":8889}}},"path":"/engine","pathType":"Prefix"}]}}],"tls":[{"hosts":["mobireg2.natujenge.ke"],"secretName":"mobireg2-ssl"}]}}
+    nginx.ingress.kubernetes.io/proxy-body-size: 5000m
+  creationTimestamp: "2022-11-21T06:09:37Z"
+  generation: 2
+  name: portal2-ingress
+  namespace: default
+  resourceVersion: "110188340906"
+  uid: 2107b31c-205e-4591-933f-c75b4405380a
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: mobireg2.natujenge.ke
+    http:
+      paths:
+      - backend:
+          service:
+            name: mobireg-portal
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: mobireg-engine
+            port:
+              number: 8889
+        path: /engine
+        pathType: Prefix
+  tls:
+  - hosts:
+    - mobireg2.natujenge.ke
+    secretName: mobireg2-ssl
+status:
+  loadBalancer:
+    ingress:
+    - ip: 51.159.114.67
+---
+apiVersion: v1
+data:
+  agg-engine-log4j: "#Define the root logger with appender file\nlog4j.rootLogger
+    = INFO, console \nlog4j.logger.5-min-agg = DEBUG, console\nlog4j.logger.30-min-agg
+    = DEBUG, console\nlog4j.logger.hourly-agg = DEBUG, console\nlog4j.logger.daily-agg
+    = DEBUG, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender  \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd
+    HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n"
+  alert-application: |
+    datasource:
+      jdbcUrl: jdbc:mysql://mulika-mysql-svc:3306/monitoring?useUnicode=true&characterEncoding=utf8&useSSL=false
+      username: root
+      password: '!QAZ2wsx'
+      maxPoolSize: 5
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+
+    alertSourceEmailAddress: alerts@meliora.tech
+    baseUrl: https://mulika.natujenge.ke
+    notificationUrl: http://51.15.233.87:15432/message/queue
+    alertSourceSmsAddress: TIARACONECT
+    contentType: application/json
+    connectionTimeout: 2000
+    readTimeout: 5000
+  alert-engine-log4j: "log4j.rootLogger = INFO, console\nlog4j.main = INFO, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender
+    \ \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd
+    HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n"
+  logback-spring.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <configuration scan="true">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+        <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <charset>utf-8</charset>
+                <Pattern>%d %-5level [%thread] %logger{0}: %msg%n</Pattern>
+            </encoder>
+        </appender>
+
+        <logger name="tech.meliora.common" level="#logback.loglevel#">
+            <appender-ref ref="Console"/>
+        </logger>
+
+        <logger name="javax.activation" level="WARN"/>
+        <logger name="javax.mail" level="WARN"/>
+        <logger name="javax.xml.bind" level="WARN"/>
+        <logger name="ch.qos.logback" level="WARN"/>
+        <logger name="com.codahale.metrics" level="WARN"/>
+        <logger name="com.netflix" level="WARN"/>
+        <logger name="com.netflix.discovery" level="INFO"/>
+        <logger name="com.ryantenney" level="WARN"/>
+        <logger name="com.sun" level="WARN"/>
+        <logger name="com.zaxxer" level="WARN"/>
+        <logger name="io.undertow" level="WARN"/>
+        <logger name="io.undertow.websockets.jsr" level="ERROR"/>
+        <logger name="org.apache" level="WARN"/>
+        <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
+        <logger name="org.bson" level="WARN"/>
+        <logger name="org.hibernate.validator" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.hibernate.ejb.HibernatePersistence" level="ERROR"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.springframework.web" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="org.springframework.cache" level="WARN"/>
+        <logger name="org.thymeleaf" level="WARN"/>
+        <logger name="org.xnio" level="WARN"/>
+        <logger name="springfox" level="WARN"/>
+        <logger name="sun.rmi" level="WARN"/>
+        <logger name="sun.net.www" level="INFO"/>
+        <logger name="sun.rmi.transport" level="WARN"/>
+
+        <!-- https://logback.qos.ch/manual/configuration.html#shutdownHook and https://jira.qos.ch/browse/LOGBACK-1090 -->
+        <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+
+        <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+            <resetJUL>true</resetJUL>
+        </contextListener>
+
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+
+    </configuration>
+  private_key.pem: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDYM3JH2KqyjXyU
+    HZ3ZaP2UH7G6qEyVvUSfM0ecvk1IIPl6jYTcYV0gnxRRbuFq+eOPXY+cJ7mbjMMX
+    lvOEV84TntQYJHGatERHvabMzfuWZATgwP+ofuHV0KRPqWKHDhOPqeio7mHgs28u
+    xoAcZTHFoW6VHDgodutwE9en0yVt6067pGG+19iKE/slyZEeH/V3DQhmHvJt5qHG
+    lSlpYjyGYrNUY7hAqchQW02RDMl7dV/PPQ/1IUs30YKJjy1aP9jjMIVzehKNoVo0
+    oSdKOVh693Eh+7PjGeQ1xsdq5KngOexWqjL3W/lunE9GDHS8YVShpnprwT1UJGoY
+    oX9ssHcFAgMBAAECggEAJ9JwDAY/SLSRW/nJi5RQUsJ0utAJjTInq9gm6lrOAsla
+    EmXzMSF45QuQE0DEYe8lqFBAJa/Weu12OMfb0kZXBZulbs31o9xs0DcBPGt7WfPR
+    xzEdVgSK5dZwkWC+bmhcF4PhAA6qdhgu1DOJQNGt1Xxa0Tm5qVBgJMxu1jFozUIp
+    w4I23nv/8Wx6QhueJoC/9GUZmZfh+2vSo8loLKAmnDVCby6r2qTQ9YjV78Pv3JOv
+    S/RDya9kVA62Y2OpuKDDhE54unm6+UGnzTQ0uW8cViuICwYMqI7FH1jzV79a10V0
+    HVCsJ9DpMmXJrq0Fejc26jMc7FEknuCwEZT/SpH3eQKBgQD2dOAVaHiLbxzjqB9e
+    iMsWAFz/UGB5zxbO0CN8kTwT0iB6awkKq3peOWgqFd99yXVBUtbVZpYiXci68oJ0
+    QO5qwdm+9EV//zoWQFu0RAlEXmm4NElryymhg1Gz5+Jq6Q+GSLyWObVu0u5M6Fv6
+    xpAwmRXGOVtlRliG/tPSqVEGfQKBgQDgkqW69NOE9OkBlPFOTd1ap4hPDgDxuAa5
+    NZEhw/KI/9g8OJwAXVDjXLMy6EwMjiSepmY5PjYeGGYtofW3SOhoc1EETplNsNYP
+    9j5QhaR/CIq6RMm6VI0C5bw9LMEIAlSTywityVmvfJA/jNWc1gnz4Ogjs55WJxnX
+    ZjDtoUKxKQKBgQCpaennjWrfnj+jlpwJpcrEkvdaYewPj3VEMPtT05oSnezJee47
+    MWjqgFfEJkj89JDvmHwpMV2evg0PxUg7la7OH/cINm3X8KADT7Y6ElK0dpoBj5+w
+    w3UYm2Z8Xrfbed28Fx/bvEulpMU+hLNFjVzsqy62lhLnaRXNpjoBo3YZGQKBgBss
+    Y3VdzoJWCCOy3Af3kAM6Jlo6fY7CD741ZxxI034URxvyVZ4NrI32V5CfXyRdxryT
+    sebXSkEV/rci09KbtdN9sJ3uzMoDzcMcrqmboi3k4LRtQmOTe4SQO9jDI5BOh+Fi
+    PeiZZoq/bcziw644j/e8jRpUz6HpFU1lBiKa0rERAoGAauVjU/69dVIq1qgmN6O7
+    kZ1ZlObHYtJzXZoKMBsf4SpR2SuQ+n6/QZ2JikF2H8E4Ulgyc9AT2rC7QRIkSIwH
+    uzobnJuzLm8sKxuOxBcaP3DUYYgJBmBk+FoVtJ+nCPOtMwKx2aeaDXYBbV/z/A8f
+    Oa/+tJikxXauL0IHpKaouG8=
+    -----END PRIVATE KEY-----
+  public_key.pem: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2DNyR9iqso18lB2d2Wj9
+    lB+xuqhMlb1EnzNHnL5NSCD5eo2E3GFdIJ8UUW7havnjj12PnCe5m4zDF5bzhFfO
+    E57UGCRxmrRER72mzM37lmQE4MD/qH7h1dCkT6lihw4Tj6noqO5h4LNvLsaAHGUx
+    xaFulRw4KHbrcBPXp9MlbetOu6RhvtfYihP7JcmRHh/1dw0IZh7ybeahxpUpaWI8
+    hmKzVGO4QKnIUFtNkQzJe3Vfzz0P9SFLN9GCiY8tWj/Y4zCFc3oSjaFaNKEnSjlY
+    evdxIfuz4xnkNcbHauSp4DnsVqoy91v5bpxPRgx0vGFUoaZ6a8E9VCRqGKF/bLB3
+    BQIDAQAB
+    -----END PUBLIC KEY-----
+  stats-engine-log4j: "log4j.rootLogger = INFO, console\nlog4j.main = INFO, console\nlog4j.logger.execution=
+    DEBUG, console\nlog4j.logger.main= INFO, console\nlog4j.logger.util= INFO, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender
+    \ \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd
+    HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"agg-engine-log4j":"#Define the root logger with appender file\nlog4j.rootLogger = INFO, console \nlog4j.logger.5-min-agg = DEBUG, console\nlog4j.logger.30-min-agg = DEBUG, console\nlog4j.logger.hourly-agg = DEBUG, console\nlog4j.logger.daily-agg = DEBUG, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender  \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n","alert-application":"datasource:\n  jdbcUrl: jdbc:mysql://mulika-mysql-svc:3306/monitoring?useUnicode=true\u0026characterEncoding=utf8\u0026useSSL=false\n  username: root\n  password: '!QAZ2wsx'\n  maxPoolSize: 5\n  cachePrepStmts: true\n  prepStmtCacheSize: 250\n  prepStmtCacheSqlLimit: 2048\n\nalertSourceEmailAddress: alerts@meliora.tech\nbaseUrl: https://mulika.meliora.ke\nnotificationUrl: http://51.15.233.87:15432/message/queue\nalertSourceSmsAddress: SMSAfrica\ncontentType: application/json\nconnectionTimeout: 2000\nreadTimeout: 5000\n","alert-engine-log4j":"log4j.rootLogger = INFO, console\nlog4j.main = INFO, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender  \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n","logback-spring.xml":"\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\n\u003cconfiguration scan=\"true\"\u003e\n    \u003cinclude resource=\"org/springframework/boot/logging/logback/base.xml\"/\u003e\n    \u003cappender name=\"Console\" class=\"ch.qos.logback.core.ConsoleAppender\"\u003e\n        \u003cencoder\u003e\n            \u003ccharset\u003eutf-8\u003c/charset\u003e\n            \u003cPattern\u003e%d %-5level [%thread] %logger{0}: %msg%n\u003c/Pattern\u003e\n        \u003c/encoder\u003e\n    \u003c/appender\u003e\n\n    \u003clogger name=\"tech.meliora.common\" level=\"#logback.loglevel#\"\u003e\n        \u003cappender-ref ref=\"Console\"/\u003e\n    \u003c/logger\u003e\n\n    \u003clogger name=\"javax.activation\" level=\"WARN\"/\u003e\n    \u003clogger name=\"javax.mail\" level=\"WARN\"/\u003e\n    \u003clogger name=\"javax.xml.bind\" level=\"WARN\"/\u003e\n    \u003clogger name=\"ch.qos.logback\" level=\"WARN\"/\u003e\n    \u003clogger name=\"com.codahale.metrics\" level=\"WARN\"/\u003e\n    \u003clogger name=\"com.netflix\" level=\"WARN\"/\u003e\n    \u003clogger name=\"com.netflix.discovery\" level=\"INFO\"/\u003e\n    \u003clogger name=\"com.ryantenney\" level=\"WARN\"/\u003e\n    \u003clogger name=\"com.sun\" level=\"WARN\"/\u003e\n    \u003clogger name=\"com.zaxxer\" level=\"WARN\"/\u003e\n    \u003clogger name=\"io.undertow\" level=\"WARN\"/\u003e\n    \u003clogger name=\"io.undertow.websockets.jsr\" level=\"ERROR\"/\u003e\n    \u003clogger name=\"org.apache\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.apache.catalina.startup.DigesterFactory\" level=\"OFF\"/\u003e\n    \u003clogger name=\"org.bson\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.hibernate.validator\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.hibernate\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.hibernate.ejb.HibernatePersistence\" level=\"ERROR\"/\u003e\n    \u003clogger name=\"org.springframework\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.springframework.web\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.springframework.security\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.springframework.cache\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.thymeleaf\" level=\"WARN\"/\u003e\n    \u003clogger name=\"org.xnio\" level=\"WARN\"/\u003e\n    \u003clogger name=\"springfox\" level=\"WARN\"/\u003e\n    \u003clogger name=\"sun.rmi\" level=\"WARN\"/\u003e\n    \u003clogger name=\"sun.net.www\" level=\"INFO\"/\u003e\n    \u003clogger name=\"sun.rmi.transport\" level=\"WARN\"/\u003e\n\n    \u003c!-- https://logback.qos.ch/manual/configuration.html#shutdownHook and https://jira.qos.ch/browse/LOGBACK-1090 --\u003e\n    \u003cshutdownHook class=\"ch.qos.logback.core.hook.DelayingShutdownHook\"/\u003e\n\n    \u003ccontextListener class=\"ch.qos.logback.classic.jul.LevelChangePropagator\"\u003e\n        \u003cresetJUL\u003etrue\u003c/resetJUL\u003e\n    \u003c/contextListener\u003e\n\n    \u003croot level=\"INFO\"\u003e\n        \u003cappender-ref ref=\"Console\"/\u003e\n    \u003c/root\u003e\n\n\u003c/configuration\u003e\n","stats-engine-log4j":"log4j.rootLogger = INFO, console\nlog4j.main = INFO, console\nlog4j.logger.execution= DEBUG, console\nlog4j.logger.main= INFO, console\nlog4j.logger.util= INFO, console\n\nlog4j.appender.console=org.apache.log4j.ConsoleAppender  \nlog4j.appender.console.target=System.out\nlog4j.appender.console.ImmediateFlush=true\nlog4j.appender.console.encoding=UTF-8\nlog4j.appender.console.layout=org.apache.log4j.PatternLayout\nlog4j.appender.console.layout.conversionPattern=%p|%d{yyyy-MM-dd HH:mm:ss.SSS}|%t|%C{1}|%M|%F|%L|%m%n\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"mulika-configs","namespace":"default"}}
+  creationTimestamp: "2024-02-12T12:09:08Z"
+  name: mulika-configs
+  namespace: default
+  resourceVersion: "110019366959"
+  uid: 0a190885-b45c-4e62-bb18-e87417e0494f
