@@ -1,5 +1,7 @@
+pub mod args;
 pub mod env;
 
+use clap::Parser;
 use tera::{Context, Tera};
 
 fn main() {
@@ -22,10 +24,24 @@ fn main() {
     // port
     // service type - ClusterIP, NodePort, LoadBalancer
 
+    let args = args::Args::parse();
+
     let mut tera = load_templates();
 
-    let deployment = generate_deployment(&mut tera, "mobireg", "mobi", "3000");
-    let service = generate_service(&mut tera, "mobireg", "NodePort", "3000");
+    let name = args.name;
+    let image = args.image;
+    let port = args.port;
+    let service_type = args.service_type;
+
+    if service_type != "NodePort" && service_type != "ClusterIP" && service_type != "LoadBalancer" {
+        panic!(
+            "Unsupported service type {}. Supported service types are [NodePort, ClusterIP, LoadBalancer]",
+            service_type
+        );
+    }
+
+    let deployment = generate_deployment(&mut tera, &name, &image, &port);
+    let service = generate_service(&mut tera, &name, &service_type, &port);
 
     println!("{}", deployment);
     println!("---");
@@ -34,13 +50,13 @@ fn main() {
 
 fn load_templates() -> Tera {
     let mut tera = Tera::default();
-    tera.add_template_file("deployment.yaml.tera", Some("deployment"))
+    tera.add_raw_template("deployment",include_str!("../templates/deployment.yaml.tera"))
         .unwrap();
-    tera.add_template_file("service.yaml.tera", Some("service"))
+    tera.add_raw_template( "service", include_str!("../templates/service.yaml.tera"))
         .unwrap();
-    tera.add_template_file("ingress.yaml.tera", Some("ingress"))
+    tera.add_raw_template( "ingress", include_str!("../templates/ingress.yaml.tera"))
         .unwrap();
-    tera.add_template_file("configmap.yaml.tera", Some("configmap"))
+    tera.add_raw_template( "configmap", include_str!("../templates/configmap.yaml.tera"))
         .unwrap();
 
     tera
