@@ -32,7 +32,7 @@ spec:
         imagePullPolicy: Always
         name: {{ name }}
         ports:
-        - containerPort: {{ port }}
+        - containerPort: 0 # set port here and add more if need be
           protocol: TCP
         resources: {}
         terminationMessagePath: /dev/termination-log
