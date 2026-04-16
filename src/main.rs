@@ -4,22 +4,11 @@ pub mod servicetype;
 
 use clap::Parser;
 use tera::{Context, Tera};
-use crate::servicetype::ServiceType;
+use crate::args::Args;
 
 fn main() {
-    println!(
-        r#"
-        ██╗  ██╗██╗   ██╗██████╗ ███████╗ ██████╗ ███████╗███╗   ██╗
-        ██║ ██╔╝██║   ██║██╔══██╗██╔════╝██╔════╝ ██╔════╝████╗  ██║
-        █████╔╝ ██║   ██║██████╔╝█████╗  ██║  ███╗█████╗  ██╔██╗ ██║
-        ██╔═██╗ ██║   ██║██╔══██╗██╔══╝  ██║   ██║██╔══╝  ██║╚██╗██║
-        ██║  ██╗╚██████╔╝██████╔╝███████╗╚██████╔╝███████╗██║ ╚████║
-        ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝
 
-                Generate Kubernetes YAML like a boss
-    "#
-    );
-
+    print_banner();
     // get user input
     // name
     // image
@@ -28,21 +17,31 @@ fn main() {
 
     let args = args::Args::parse();
 
-    let mut tera = load_templates();
-
-    let name = args.name;
-    let image = args.image;
-    let port = args.port;
-    let service_type = args.service_type;
+    let tera = load_templates();
 
     // validate_inputs(&name, &image, &port, &service_type);
 
-    let deployment = generate_deployment(&mut tera, &name, &image, &port);
-    let service = generate_service(&mut tera, &name, &service_type, &port);
+    let deployment = generate_deployment(&tera, &args);
+    let service = generate_service(&tera, &args);
 
     println!("{}", deployment);
     println!("---");
     println!("{}", service);
+}
+
+fn print_banner(){
+    println!(
+    r#"
+    ██╗  ██╗██╗   ██╗██████╗ ███████╗ ██████╗ ███████╗███╗   ██╗
+    ██║ ██╔╝██║   ██║██╔══██╗██╔════╝██╔════╝ ██╔════╝████╗  ██║
+    █████╔╝ ██║   ██║██████╔╝█████╗  ██║  ███╗█████╗  ██╔██╗ ██║
+    ██╔═██╗ ██║   ██║██╔══██╗██╔══╝  ██║   ██║██╔══╝  ██║╚██╗██║
+    ██║  ██╗╚██████╔╝██████╔╝███████╗╚██████╔╝███████╗██║ ╚████║
+    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝
+
+            Generate Kubernetes YAML like a boss
+    "#
+    );
 }
 
 fn load_templates() -> Tera {
@@ -59,22 +58,20 @@ fn load_templates() -> Tera {
     tera
 }
 
-
-
-fn generate_deployment(tera: &Tera, name: &str, image: &str, port: &str) -> String {
+fn generate_deployment(tera: &Tera, args: &Args) -> String {
     let mut context = Context::new();
-    context.insert("name", name);
-    context.insert("image", image);
-    context.insert("port", port);
+    context.insert("name", &args.name);
+    context.insert("image", &args.image);
+    context.insert("port", &args.port);
     let rendered = tera.render("deployment", &context).unwrap();
     rendered
 }
 
-fn generate_service(tera: &Tera, name: &str, service_type: &ServiceType, port: &str) -> String {
+fn generate_service(tera: &Tera, args: &Args) -> String {
     let mut context = Context::new();
-    context.insert("name", name);
-    context.insert("service_type", service_type);
-    context.insert("port", port);
+    context.insert("name", &args.name);
+    context.insert("service_type", &args.service_type);
+    context.insert("port", &args.port);
 
     let rendered = tera.render("service", &context).unwrap();
     rendered

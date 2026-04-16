@@ -10,7 +10,7 @@ pub struct Args {
     pub image: String,
 
     #[arg(long)]
-    pub port: String,
+    pub port: u16,
 
     // ClusterIP, NodePort, LoadBalancer
     #[arg(long, value_enum)]
