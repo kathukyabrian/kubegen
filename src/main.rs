@@ -33,6 +33,8 @@ fn main() {
     let port = args.port;
     let service_type = args.service_type;
 
+    validate_inputs(&name, &image, &port, &service_type);
+
     if service_type != "NodePort" && service_type != "ClusterIP" && service_type != "LoadBalancer" {
         panic!(
             "Unsupported service type {}. Supported service types are [NodePort, ClusterIP, LoadBalancer]",
@@ -60,6 +62,15 @@ fn load_templates() -> Tera {
         .unwrap();
 
     tera
+}
+
+fn validate_inputs(_name: &str, _image: &str, _port: &str, service_type: &str) {
+    if service_type != "NodePort" && service_type != "ClusterIP" && service_type != "LoadBalancer" {
+        panic!(
+            "Unsupported service type '{}'. Supported service types are [NodePort, ClusterIP, LoadBalancer]",
+            service_type
+        );
+    }
 }
 
 fn generate_deployment(tera: &Tera, name: &str, image: &str, port: &str) -> String {
