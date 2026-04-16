@@ -1,4 +1,5 @@
 use clap::Parser;
+use crate::servicetype::ServiceType;
 
 #[derive(Parser)]
 pub struct Args {
@@ -12,6 +13,6 @@ pub struct Args {
     pub port: String,
 
     // ClusterIP, NodePort, LoadBalancer
-    #[arg(long)]
-    pub service_type: String,
+    #[arg(long, value_enum)]
+    pub service_type: ServiceType,
 }

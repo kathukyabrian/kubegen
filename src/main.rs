@@ -1,8 +1,10 @@
 pub mod args;
 pub mod env;
+pub mod servicetype;
 
 use clap::Parser;
 use tera::{Context, Tera};
+use crate::servicetype::ServiceType;
 
 fn main() {
     println!(
@@ -33,14 +35,7 @@ fn main() {
     let port = args.port;
     let service_type = args.service_type;
 
-    validate_inputs(&name, &image, &port, &service_type);
-
-    if service_type != "NodePort" && service_type != "ClusterIP" && service_type != "LoadBalancer" {
-        panic!(
-            "Unsupported service type {}. Supported service types are [NodePort, ClusterIP, LoadBalancer]",
-            service_type
-        );
-    }
+    // validate_inputs(&name, &image, &port, &service_type);
 
     let deployment = generate_deployment(&mut tera, &name, &image, &port);
     let service = generate_service(&mut tera, &name, &service_type, &port);
@@ -64,14 +59,7 @@ fn load_templates() -> Tera {
     tera
 }
 
-fn validate_inputs(_name: &str, _image: &str, _port: &str, service_type: &str) {
-    if service_type != "NodePort" && service_type != "ClusterIP" && service_type != "LoadBalancer" {
-        panic!(
-            "Unsupported service type '{}'. Supported service types are [NodePort, ClusterIP, LoadBalancer]",
-            service_type
-        );
-    }
-}
+
 
 fn generate_deployment(tera: &Tera, name: &str, image: &str, port: &str) -> String {
     let mut context = Context::new();
@@ -82,7 +70,7 @@ fn generate_deployment(tera: &Tera, name: &str, image: &str, port: &str) -> Stri
     rendered
 }
 
-fn generate_service(tera: &Tera, name: &str, service_type: &str, port: &str) -> String {
+fn generate_service(tera: &Tera, name: &str, service_type: &ServiceType, port: &str) -> String {
     let mut context = Context::new();
     context.insert("name", name);
     context.insert("service_type", service_type);
