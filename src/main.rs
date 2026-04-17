@@ -66,8 +66,8 @@ fn generate_deployment(tera: &Tera, args: &Args) -> String {
     context.insert("name", &args.name);
     context.insert("image", &args.image);
     context.insert("port", &args.port);
-    let rendered = tera.render("deployment", &context).unwrap();
-    rendered
+
+    render("deployment", &tera, &context)
 }
 
 fn generate_service(tera: &Tera, args: &Args) -> String {
@@ -76,8 +76,7 @@ fn generate_service(tera: &Tera, args: &Args) -> String {
     context.insert("service_type", &args.service_type);
     context.insert("port", &args.port);
 
-    let rendered = tera.render("service", &context).unwrap();
-    rendered
+    render("service", &tera, &context)
 }
 
 fn generate_ingress(tera: &Tera, args: &Args) -> String {
@@ -87,14 +86,17 @@ fn generate_ingress(tera: &Tera, args: &Args) -> String {
     context.insert("host", &args.host);
     context.insert("certificate_issuer", &args.certificate_issuer);
 
-    let rendered = tera.render("ingress", &context).unwrap();
-    rendered
+    render("ingress", &tera, &context)
 }
 
-fn generate_config_map(tera: &Tera, args: &Args) -> String{
+fn generate_config_map(tera: &Tera, args: &Args) -> String {
     let mut context = Context::new();
     context.insert("name", &args.name);
 
-    let rendered = tera.render("configmap", &context).unwrap();
+    render("configmap", &tera, &context)
+}
+
+fn render(template_name: &str, tera: &Tera, context: &Context) -> String {
+    let rendered = tera.render(template_name, &context).unwrap();
     rendered
 }
