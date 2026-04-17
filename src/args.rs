@@ -15,4 +15,10 @@ pub struct Args {
     // ClusterIP, NodePort, LoadBalancer
     #[arg(long, value_enum)]
     pub service_type: ServiceType,
+    
+    #[arg(long)]
+    pub host: String,
+
+    #[arg(long)]
+    pub certificate_issuer: String,
 }
