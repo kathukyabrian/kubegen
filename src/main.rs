@@ -16,12 +16,15 @@ fn main() {
     let deployment = generate_deployment(&tera, &args);
     let service = generate_service(&tera, &args);
     let ingress = generate_ingress(&tera, &args);
+    let configmap = generate_config_map(&tera, &args);
 
     println!("{}", deployment);
     println!("---");
     println!("{}", service);
     println!("---");
     println!("{}", ingress);
+    println!("---");
+    println!("{}", configmap);
 }
 
 fn print_banner() {
@@ -88,7 +91,11 @@ fn generate_ingress(tera: &Tera, args: &Args) -> String {
     let rendered = tera.render("ingress", &context).unwrap();
     rendered
 }
-//
-// fn generateConfigMap(){
-//
-// }
+
+fn generate_config_map(tera: &Tera, args: &Args) -> String{
+    let mut context = Context::new();
+    context.insert("name", &args.name);
+
+    let rendered = tera.render("configmap", &context).unwrap();
+    rendered
+}
