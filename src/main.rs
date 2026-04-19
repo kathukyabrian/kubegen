@@ -5,25 +5,24 @@ use crate::args::Args;
 use clap::Parser;
 use tera::{Context, Tera};
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     print_banner();
 
     let args = args::Args::parse();
 
-    let tera = load_templates();
+    let tera = load_templates()?;
 
     let deployment = generate_deployment(&tera, &args);
     let service = generate_service(&tera, &args);
     let ingress = generate_ingress(&tera, &args);
     let configmap = generate_config_map(&tera, &args);
 
-    println!("{}", deployment);
-    println!("---");
-    println!("{}", service);
-    println!("---");
-    println!("{}", ingress);
-    println!("---");
-    println!("{}", configmap);
+    println!(
+        "{}\n---\n{}\n---\n{}\n---\n{}",
+        deployment, service, ingress, configmap
+    );
+
+    Ok(())
 }
 
 fn print_banner() {
@@ -41,24 +40,20 @@ fn print_banner() {
     );
 }
 
-fn load_templates() -> Tera {
+fn load_templates() -> Result<Tera, tera::Error> {
     let mut tera = Tera::default();
     tera.add_raw_template(
         "deployment",
         include_str!("../templates/deployment.yaml.tera"),
-    )
-    .unwrap();
-    tera.add_raw_template("service", include_str!("../templates/service.yaml.tera"))
-        .unwrap();
-    tera.add_raw_template("ingress", include_str!("../templates/ingress.yaml.tera"))
-        .unwrap();
+    )?;
+    tera.add_raw_template("service", include_str!("../templates/service.yaml.tera"))?;
+    tera.add_raw_template("ingress", include_str!("../templates/ingress.yaml.tera"))?;
     tera.add_raw_template(
         "configmap",
         include_str!("../templates/configmap.yaml.tera"),
-    )
-    .unwrap();
+    )?;
 
-    tera
+    Ok(tera)
 }
 
 fn generate_deployment(tera: &Tera, args: &Args) -> String {
@@ -76,7 +71,7 @@ fn generate_service(tera: &Tera, args: &Args) -> String {
     context.insert("service_type", &args.service_type);
     context.insert("port", &args.port);
 
-    render("service", &tera, &context)
+    render("service", tera, &context)
 }
 
 fn generate_ingress(tera: &Tera, args: &Args) -> String {
@@ -86,14 +81,14 @@ fn generate_ingress(tera: &Tera, args: &Args) -> String {
     context.insert("host", &args.host);
     context.insert("certificate_issuer", &args.certificate_issuer);
 
-    render("ingress", &tera, &context)
+    render("ingress", tera, &context)
 }
 
 fn generate_config_map(tera: &Tera, args: &Args) -> String {
     let mut context = Context::new();
     context.insert("name", &args.name);
 
-    render("configmap", &tera, &context)
+    render("configmap", tera, &context)
 }
 
 fn render(template_name: &str, tera: &Tera, context: &Context) -> String {
