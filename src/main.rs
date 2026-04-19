@@ -12,10 +12,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let tera = load_templates()?;
 
-    let deployment = generate_deployment(&tera, &args);
-    let service = generate_service(&tera, &args);
-    let ingress = generate_ingress(&tera, &args);
-    let configmap = generate_config_map(&tera, &args);
+    let deployment = generate_deployment(&tera, &args)?;
+    let service = generate_service(&tera, &args)?;
+    let ingress = generate_ingress(&tera, &args)?;
+    let configmap = generate_config_map(&tera, &args)?;
 
     println!(
         "{}\n---\n{}\n---\n{}\n---\n{}",
@@ -56,16 +56,16 @@ fn load_templates() -> Result<Tera, tera::Error> {
     Ok(tera)
 }
 
-fn generate_deployment(tera: &Tera, args: &Args) -> String {
+fn generate_deployment(tera: &Tera, args: &Args) -> Result<String, tera::Error> {
     let mut context = Context::new();
     context.insert("name", &args.name);
     context.insert("image", &args.image);
     context.insert("port", &args.port);
 
-    render("deployment", &tera, &context)
+    render("deployment", tera, &context)
 }
 
-fn generate_service(tera: &Tera, args: &Args) -> String {
+fn generate_service(tera: &Tera, args: &Args) -> Result<String, tera::Error> {
     let mut context = Context::new();
     context.insert("name", &args.name);
     context.insert("service_type", &args.service_type);
@@ -74,7 +74,7 @@ fn generate_service(tera: &Tera, args: &Args) -> String {
     render("service", tera, &context)
 }
 
-fn generate_ingress(tera: &Tera, args: &Args) -> String {
+fn generate_ingress(tera: &Tera, args: &Args) -> Result<String, tera::Error> {
     let mut context = Context::new();
     context.insert("name", &args.name);
     context.insert("port", &args.port);
@@ -84,14 +84,13 @@ fn generate_ingress(tera: &Tera, args: &Args) -> String {
     render("ingress", tera, &context)
 }
 
-fn generate_config_map(tera: &Tera, args: &Args) -> String {
+fn generate_config_map(tera: &Tera, args: &Args) -> Result<String, tera::Error> {
     let mut context = Context::new();
     context.insert("name", &args.name);
 
     render("configmap", tera, &context)
 }
 
-fn render(template_name: &str, tera: &Tera, context: &Context) -> String {
-    let rendered = tera.render(template_name, &context).unwrap();
-    rendered
+fn render(template_name: &str, tera: &Tera, context: &Context) -> Result<String, tera::Error> {
+    tera.render(template_name, &context)
 }
